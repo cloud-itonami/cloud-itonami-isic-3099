@@ -511,9 +511,9 @@
             (for [[rule vs] grouped]
               (tr (str "<code>:" (esc (name rule)) "</code>")
                   (count vs)
-                  (str/join ", " (map #(str "<code>" (esc (:subject %)) "</code>")
-                                      (distinct (map #(select-keys % [:subject]) vs))))
-                  (str/join "<br>" (map #(esc (:detail %)) (distinct (map :detail vs))))))))))
+                  (str/join ", " (map #(str "<code>" (esc %) "</code>")
+                                      (distinct (map :subject vs))))
+                  (str/join "<br>" (map esc (distinct (map :detail vs))))))))))
 
 (defn- phase-section []
   (section
@@ -738,8 +738,21 @@
     (when (empty? (approval-grants))
       (throw (ex-info "render-html: the run produced ZERO :approval-granted facts -- the human-in-the-loop path was not exercised, so the approver-attribution section would measure nothing"
                       {:graph-audit-facts (count (graph-audit))})))
-    (io/make-parents out)
-    (spit out (render db))
+    ;; Third floor, on the rendered bytes rather than on the data. The
+    ;; first version of `hard-holds-section` mapped `:detail` over a seq
+    ;; of strings and rendered an empty cell for every rule -- the data
+    ;; was right, the page was blank, and both data-level checks above
+    ;; passed. So: every explanation the governor actually produced must
+    ;; be findable in the document that gets written.
+    (let [html (render db)
+          details (distinct (map :detail (mapcat :violations holds)))
+          absent (remove #(str/includes? html (esc %)) details)]
+      (when (seq absent)
+        (throw (ex-info (str "render-html: " (count absent) " of " (count details)
+                             " governor explanations never reached the rendered page")
+                        {:absent (vec absent)})))
+      (io/make-parents out)
+      (spit out html))
     (println "wrote" out)
     (println " " (count ledger) "ledger facts,"
              (count holds) "HARD holds over" (count fired) "distinct rules,"
