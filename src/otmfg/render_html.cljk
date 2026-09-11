@@ -34,7 +34,7 @@
   A console that silently lost its HARD holds is not publishable -- the
   whole point of the page is that the governor refuses things.
 
-  Usage: `clojure -M:render-html [out-file]`
+  Usage: `kbb -M:render-html [out-file]`
   (default `docs/samples/operator-console.html`)."
   (:require [clojure.java.io :as io]
             [kotoba.lang.text :as str]
@@ -690,7 +690,7 @@
       "About this page"
       nil
       (str "    <p>Generated at build time by <code>otmfg.render-html</code> "
-           "(<code>clojure -M:render-html</code>), which runs the real actor — "
+           "(<code>kbb -M:render-html</code>), which runs the real actor — "
            "<code>otmfg.operation</code>'s langgraph StateGraph, with "
            "<code>otmfg.governor</code> as an independent censor and "
            "<code>otmfg.store</code> as the SSoT — over the seed in "
