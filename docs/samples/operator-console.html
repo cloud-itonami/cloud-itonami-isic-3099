@@ -2469,7 +2469,7 @@ img,svg { max-width: 100%; height: auto; }</style></head><body>
 <main>
   <section class="card">
     <h2>About this page</h2>
-    <p>Generated at build time by <code>otmfg.render-html</code> (<code>clojure -M:render-html</code>), which runs the real actor — <code>otmfg.operation</code>'s langgraph StateGraph, with <code>otmfg.governor</code> as an independent censor and <code>otmfg.store</code> as the SSoT — over the seed in <code>otmfg.store/sample-data!</code>. Every batch id, equipment id, capacity, quantity, hold reason and ledger row below is that run's output.</p>
+    <p>Generated at build time by <code>otmfg.render-html</code> (<code>kbb -M:render-html</code>), which runs the real actor — <code>otmfg.operation</code>'s langgraph StateGraph, with <code>otmfg.governor</code> as an independent censor and <code>otmfg.store</code> as the SSoT — over the seed in <code>otmfg.store/sample-data!</code>. Every batch id, equipment id, capacity, quantity, hold reason and ledger row below is that run's output.</p>
     <p>This actor coordinates <em>records</em>: it drafts production-batch logs, maintenance windows, safety-concern flags and shipment proposals. It never actuates assembly-line equipment, never dispatches a freight carrier, and never issues a transport-equipment safety/roadworthiness certification — the governor blocks all three permanently, with no human override.</p>
   </section>
   <section class="card">
