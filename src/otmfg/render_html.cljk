@@ -36,7 +36,7 @@
 
   Usage: `kbb -M:render-html [out-file]`
   (default `docs/samples/operator-console.html`)."
-  (:require [clojure.java.io :as io]
+  (:require [kotoba.io :as io]
             [kotoba.lang.text :as str]
             [jp-go-dds.skin :as skin]
             [langgraph.graph :as g]
