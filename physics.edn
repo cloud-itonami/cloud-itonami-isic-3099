@@ -1,0 +1,44 @@
+;; What this vertical's robot physically does, declared for
+;; kotoba.robotics.process (kotoba-lang/robotics). `kbb -M:dev:physics` runs it.
+;;
+;; README: an ISIC 3099 plant assembles carts, wagons, hand-trucks,
+;; wheelbarrows, rickshaws and sledges on a chassis/axle/wheel/body line and
+;; inspects them on structural/load test benches. The physical work around
+;; that plant: an arm mounting wheels on axles, tensile-testing the chassis
+;; steel, and an AMR moving a stacked load of finished hand-trucks across the
+;; yard ramp to dispatch.
+;;
+;; Every number without a cited source is marked `estimate` in its :basis.
+;; Replacing an estimate with a sourced value is this bot's growth work.
+{:physics/schema "itonami.physical-ai.spec.v1"
+ :repo "cloud-itonami/cloud-itonami-isic-3099"
+ :cases
+ [{:id :mount-wheel-on-axle
+   :kind :manipulator
+   :procedure "wheel-line arm lifts a tyred wheel from the wheel rack and slides it onto the cart's axle stub"
+   :params {:l1-m 0.50 :l2-m 0.45 :m1-kg 6.0 :m2-kg 4.0
+            :from [0.60 0.30] :to [0.55 -0.10] :duration-s 1.5 :steps 400}
+   :sweep {:param :payload-kg :values [2.0 4.0 7.0 10.0 15.0]}
+   :quantity :peak-tau1-nm
+   :limit {:max 100.0 :basis "estimate: continuous shoulder torque of a ~12 kg-payload collaborative arm class"}
+   :boundary {:lo 0.5 :hi 50.0}}
+  {:id :chassis-steel-tensile
+   :kind :material
+   :procedure "incoming inspection: tensile test of an SS400 chassis-strip specimen (<= 16 mm, 100 mm2 section) used for cart and wagon frames"
+   :params {:length-m 0.10 :area-m2 1.0e-4 :youngs-modulus-pa 206.0e9 :hardening-pa 1.0e9
+            :density-kg-m3 7850.0 :max-force-n 40000.0}
+   :sweep {:param :yield-stress-pa :values [215.0e6 235.0e6 245.0e6 270.0e6 310.0e6]}
+   :quantity :yield-force-n
+   :limit {:min 24500.0 :basis "JIS G 3101 SS400, thickness <= 16 mm: minimum yield point 245 N/mm2; x 100 mm2 = 24500 N"}
+   :boundary {:lo 190.0e6 :hi 330.0e6}}
+  {:id :hand-truck-stack-over-yard-ramp
+   :kind :transport
+   :procedure "AMR carries a stack of finished hand-trucks up the 8-degree yard ramp to the dispatch dock (25 m); the stack height sets the load's CoG"
+   :params {:mass-kg 200.0 :payload-kg 180.0 :distance-m 25.0 :v-max-mps 0.8 :a-max-mps2 0.4
+            :brake-decel-mps2 0.7 :drive-force-n 1200.0 :crr 0.015 :slope-deg 8.0
+            :cog-height-m 0.30 :support-half-length-m 0.40
+            :max-time-s 900.0}
+   :sweep {:param :payload-cog-height-m :values [0.5 0.8 1.1 1.4 1.8]}
+   :quantity :min-tipover-margin
+   :limit {:min 0.3 :basis "estimate: keep 30 % of the static restoring moment in reserve for ramp lips and a shifting stack"}
+   :boundary {:lo 0.3 :hi 3.0}}]}
